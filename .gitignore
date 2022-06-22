@@ -1,4 +1,5 @@
 /backend/env
 .env
-/backend/credentials.json
+/backend/spreadsheet_logic/credentials.json
 /frontend/node_modules
+__pycache__
