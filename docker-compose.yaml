@@ -12,6 +12,8 @@ services:
     depends_on:
       - postgres
     command: bash -c "./wait-for-it.sh postgres:5432 && alembic upgrade head && python3 server.py"
+    ports:
+      - "5000:5000"
   frontend:
     build: ./frontend
     depends_on:

@@ -235,7 +235,7 @@ def delete_old_orders():
     Deletes all orders
     """
     try:
-        res = requests.delete("http://localhost:5000/orders")
+        res = requests.delete("http://backend:5000/orders")
 
         if res.status_code != 200:
             print(f"Res status code is: {res.status_code}")
