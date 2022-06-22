@@ -7,14 +7,16 @@ from database.models import Order
 from sqlalchemy.orm import Session
 from database.database_logic import engine
 from flask import Response, jsonify
+from typing import List
 
 
-def handle_save_orders(order_data: dict):
+def handle_save_orders(order_data: List[dict]):
     try:
         with Session(engine) as db:
-            order_to_save = Order(**order_data)
-            db.add(order_to_save)
-            db.commit()
+            for data in order_data:
+                order_to_save = Order(**data)
+                db.add(order_to_save)
+                db.commit()
     except Exception as execution_error:
         print(f"Error while saving order: {execution_error}")
         return Response("Internal Server Error.", status=500)

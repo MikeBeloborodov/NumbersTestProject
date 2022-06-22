@@ -56,11 +56,35 @@ def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
         for counter, value in enumerate(spreadsheet_data):
             if counter == 0:
                 continue
+            if not value:
+                continue
 
-            order_table_num = value[0]
-            order_num = value[1]
-            price_usd = value[2]
-            delivery_date = value[3]
+            spreadsheet_row_length = len(value)
+
+            # Check length of data to avoid index out of range
+            if spreadsheet_row_length >= 1:
+                if value[0]:
+                    order_table_num = value[0]
+            else:
+                order_table_num = None
+
+            if spreadsheet_row_length >= 2:
+                if value[1]:
+                    order_num = value[1]
+            else:
+                order_num = None
+
+            if spreadsheet_row_length >= 3:
+                if value[2]:
+                    price_usd = value[2]
+            else:
+                price_usd = None
+            
+            if spreadsheet_row_length >= 4:
+                if value[3]:
+                    delivery_date = value[3]
+            else:
+                delivery_date = None
 
             prepared_data = {
                 "order_table_num": order_table_num,
@@ -169,8 +193,14 @@ def save_old_data_json(spreadsheet_data: List[dict]) -> None:
         conv_rate = get_usd_convertion_rate()
 
         for data in spreadsheet_data:
-            price_rub = float(data['price_usd']) * conv_rate
-            price_rub = math.trunc(price_rub * 100.0) / 100.0
+            price_usd = data['price_usd']
+            if price_usd == None:
+                price_rub = None
+            elif not price_usd.replace(".", "").strip().isnumeric():
+                price_rub = None
+            else:
+                price_rub = float(data['price_usd']) * conv_rate
+                price_rub = math.trunc(price_rub * 100.0) / 100.0
 
             data.update({"price_rub": price_rub})
 
@@ -188,12 +218,11 @@ def send_data_to_server(spreadsheet_data: List[dict]) -> None:
     Sends data to the backend Flask API
     """
     try:
-        for data in spreadsheet_data:
-            res = requests.post("http://localhost:5000/orders", json=data)
+        res = requests.post("http://localhost:5000/orders", json=spreadsheet_data)
 
-            if res.status_code != 201:
-                print(f"Res status code is: {res.status_code}")
-                raise Exception
+        if res.status_code != 201:
+            print(f"Res status code is: {res.status_code}")
+            raise Exception
 
     except Exception as error:
         print("Error while sending data to server: ")
