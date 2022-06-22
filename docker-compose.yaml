@@ -5,13 +5,13 @@ services:
     build: ./backend
     depends_on:
       - postgres
-    command: bash -c "./wait-for-it.sh localhost:5434 && alembic upgrade head && python3 server.py"
+    command: bash -c "./wait-for-it.sh localhost:5433 && alembic upgrade head && python3 server.py"
   postgres:
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5434:5434"
+      - "5433:5432"
   frontend:
     build: ./frontend
     depends_on:
