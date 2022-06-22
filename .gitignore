@@ -3,3 +3,5 @@
 /backend/spreadsheet_logic/credentials.json
 /frontend/node_modules
 __pycache__
+old_data.json
+currency.xml

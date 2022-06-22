@@ -2,6 +2,8 @@ import os.path
 import requests
 import json
 import math
+import time
+from typing import List
 import xml.etree.ElementTree as elem_tree
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
@@ -10,7 +12,8 @@ from google.oauth2 import service_account
 BASE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 CREDENTIALS_FILE_NAME = "credentials.json"
 CURRENCY_FILE_NAME = "currency.xml"
-JSON_DATA_FILE_NAME = "gathered_data.json"
+OLD_SPREADSHEET_DATA_FILE_NAME = "old_data.json"
+SLEEP_TIME = 10
 
 
 def get_spreadsheet_data() -> list:
@@ -42,6 +45,67 @@ def get_spreadsheet_data() -> list:
         raise error
 
     return values
+
+
+def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
+    try:
+        converted_data = []
+        for counter, value in enumerate(spreadsheet_data):
+            if counter == 0:
+                continue
+
+            order_table_num = value[0]
+            order_num = value[1]
+            price_usd = value[2]
+            delivery_date = value[3]
+
+            prepared_data = {
+                "order_table_num": order_table_num,
+                "order_num": order_num,
+                "price_usd": price_usd,
+                "delivery_date": delivery_date
+            }
+
+            converted_data.append(prepared_data)
+
+    except Exception as error:
+        print("Error while converting spreadsheet data to dict: ")
+        raise error
+    
+    return converted_data
+
+
+def load_old_spreadsheet_data() -> List[dict]:
+    try:
+        path = os.path.join(BASE_DIRECTORY, OLD_SPREADSHEET_DATA_FILE_NAME)
+        with open(path, "r") as file:
+            data_raw = file.read()
+            json_data = json.loads(data_raw)
+
+    except Exception as error:
+        print("Error while loading old spreadsheet data: ")
+        raise error
+
+    return json_data
+
+
+def compare_old_new_data(old_data: List[dict], new_data: List[dict]) -> bool:
+    try:
+        if not old_data:
+            return True
+
+        if len(new_data) != len(old_data):
+            return True
+        
+        for index in range(len(new_data)):
+            if new_data[index] != old_data[index]:
+                return True
+        
+    except Exception as error:
+        print("Error while comparing old and new data: ")
+        raise error
+
+    return False
 
 
 def save_currency_xml() -> None:
@@ -85,66 +149,76 @@ def get_usd_convertion_rate() -> float:
     return float(usd_rate)
 
 
-def save_gathered_data_json() -> None:
+def save_old_data_json(spreadsheet_data: List[dict]) -> None:
     """
     Prepares and saves all gathered data from the spreadsheet
     as a json format file.
     """
     try:
-        spreadsheet_data = get_spreadsheet_data()
         conv_rate = get_usd_convertion_rate()
-        data_to_save_as_json = []
 
-        for counter, value in enumerate(spreadsheet_data):
-            if counter == 0:
-                continue
-
-            order_table_num = value[0]
-            order_num = value[1]
-            price_usd = float(value[2])
-            price_rub = price_usd * conv_rate
+        for data in spreadsheet_data:
+            price_rub = float(data['price_usd']) * conv_rate
             price_rub = math.trunc(price_rub * 100.0) / 100.0
-            delivery_date = value[3]
 
-            prepared_data = {
-                "order_table_num": order_table_num,
-                "order_num": order_num,
-                "price_rub": price_rub,
-                "price_usd": price_usd,
-                "delivery_date": delivery_date
-            }
+            data.update({"price_rub": price_rub})
 
-            data_to_save_as_json.append(prepared_data)
-
-        path = os.path.join(BASE_DIRECTORY, JSON_DATA_FILE_NAME)
+        path = os.path.join(BASE_DIRECTORY, OLD_SPREADSHEET_DATA_FILE_NAME)
         with open(path, "w") as file:
-            file.write(json.dumps(data_to_save_as_json))
+            file.write(json.dumps(spreadsheet_data))
         
     except Exception as error:
         print("Error while saving gathered data as json: ")
         raise error
 
 
-def send_data_to_server():
+def send_data_to_server(spreadsheet_data: List[dict]) -> None:
     try:
-        path = os.path.join(BASE_DIRECTORY, JSON_DATA_FILE_NAME)
-        with open(path, "r") as file:
-            data_raw = file.read()
-            json_data = json.loads(data_raw)
+        for data in spreadsheet_data:
+            res = requests.post("http://localhost:5000/orders", json=data)
 
-        res = requests.post("http://localhost:5000/orders", json=json_data[0])
-        print(res.status_code)
+            if res.status_code != 201:
+                raise Exception
 
     except Exception as error:
         print("Error while sending data to server: ")
         raise error
 
 
+def delete_old_orders():
+    try:
+        res = requests.delete("http://localhost:5000/orders")
+
+        if res.status_code != 200:
+            raise Exception
+
+    except Exception as error:
+        print("Error while trying to delete old orders: ")
+        raise error
+
+
 def main() -> None:
     try:
-        save_currency_xml()
-        save_gathered_data_json()
-        send_data_to_server()
+        while True:
+            # Get data from the spreadsheet and convert it
+            new_data = get_spreadsheet_data()
+            new_data = convert_spreadsheet_data_to_dict(new_data)
+
+            # Get old data from the file (if exists) and convert it
+            if os.path.exists(os.path.join(BASE_DIRECTORY, OLD_SPREADSHEET_DATA_FILE_NAME)):
+                old_data = load_old_spreadsheet_data()
+            else:
+                old_data = []
+
+            # Compare old and new data
+            is_different = compare_old_new_data(old_data, new_data)
+
+            if is_different:
+                save_old_data_json(new_data)
+                delete_old_orders()
+                send_data_to_server(new_data)
+
+            time.sleep(SLEEP_TIME)
 
     except Exception as error:
         print(error)
