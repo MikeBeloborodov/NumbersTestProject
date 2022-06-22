@@ -3,14 +3,13 @@ import os
 sys.path.append(os.path.join(sys.path[0],'schemas'))
 sys.path.append(os.path.join(sys.path[0],'database'))
 
-from schemas import post_order_request
 from database.models import Order
 from sqlalchemy.orm import Session
 from database.database_logic import engine
 from flask import Response, jsonify
 
 
-def handle_save_orders(order_data: post_order_request):
+def handle_save_orders(order_data: dict):
     try:
         with Session(engine) as db:
             order_to_save = Order(**order_data)

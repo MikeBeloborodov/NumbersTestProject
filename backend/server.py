@@ -1,6 +1,5 @@
 from flask import Flask, request
 from flask_cors import CORS
-from schemas import post_order_request
 from handles.order_handles import handle_save_orders
 from handles.order_handles import handle_delete_all_orders
 from handles.order_handles import handle_send_all_orders

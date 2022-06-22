@@ -13,7 +13,7 @@ BASE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 CREDENTIALS_FILE_NAME = "credentials.json"
 CURRENCY_FILE_NAME = "currency.xml"
 OLD_SPREADSHEET_DATA_FILE_NAME = "old_data.json"
-SLEEP_TIME = 10
+SLEEP_TIME = 3
 
 
 def get_spreadsheet_data() -> list:
@@ -48,6 +48,9 @@ def get_spreadsheet_data() -> list:
 
 
 def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
+    """
+    Converts spreadsheet data of a list type into a dict type
+    """
     try:
         converted_data = []
         for counter, value in enumerate(spreadsheet_data):
@@ -76,6 +79,9 @@ def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
 
 
 def load_old_spreadsheet_data() -> List[dict]:
+    """
+    Loads old spreadsheet data to compare with new data
+    """
     try:
         path = os.path.join(BASE_DIRECTORY, OLD_SPREADSHEET_DATA_FILE_NAME)
         with open(path, "r") as file:
@@ -90,6 +96,10 @@ def load_old_spreadsheet_data() -> List[dict]:
 
 
 def compare_old_new_data(old_data: List[dict], new_data: List[dict]) -> bool:
+    """
+    Compare new and old spreadsheet data
+    Returns True if they are and False if they're not
+    """
     try:
         if not old_data:
             return True
@@ -155,6 +165,7 @@ def save_old_data_json(spreadsheet_data: List[dict]) -> None:
     as a json format file.
     """
     try:
+        save_currency_xml()
         conv_rate = get_usd_convertion_rate()
 
         for data in spreadsheet_data:
@@ -173,6 +184,9 @@ def save_old_data_json(spreadsheet_data: List[dict]) -> None:
 
 
 def send_data_to_server(spreadsheet_data: List[dict]) -> None:
+    """
+    Sends data to the backend Flask API
+    """
     try:
         for data in spreadsheet_data:
             res = requests.post("http://localhost:5000/orders", json=data)
@@ -187,6 +201,10 @@ def send_data_to_server(spreadsheet_data: List[dict]) -> None:
 
 
 def delete_old_orders():
+    """
+    Sends a delete request to the backend Flask API
+    Deletes all orders
+    """
     try:
         res = requests.delete("http://localhost:5000/orders")
 
@@ -200,8 +218,13 @@ def delete_old_orders():
 
 
 def main() -> None:
-    try:
-        while True:
+    """
+    Every SLEEP_TIME seconds compares old and new data
+    from the google spreadsheet, if data is different
+    deletes old data from SQL database and rewrites with the new data
+    """
+    while True:
+        try:
             # Get data from the spreadsheet and convert it
             new_data = get_spreadsheet_data()
             new_data = convert_spreadsheet_data_to_dict(new_data)
@@ -215,6 +238,8 @@ def main() -> None:
             # Compare old and new data
             is_different = compare_old_new_data(old_data, new_data)
 
+            # If different saves old data to json, deletes data 
+            # from SQL database and sends new data to the server
             if is_different:
                 save_old_data_json(new_data)
                 delete_old_orders()
@@ -222,8 +247,8 @@ def main() -> None:
 
             time.sleep(SLEEP_TIME)
 
-    except Exception as error:
-        print(error)
+        except Exception as error:
+            print(error)
 
 
 if __name__ == '__main__':
