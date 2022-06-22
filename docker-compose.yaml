@@ -1,11 +1,18 @@
 version: '3'
 
 services:
+  backend:
+    build: ./backend
+    depends_on:
+      - postgres
+    command: bash -c "./wait-for-it.sh db:5432 alembic upgrade head && python3 server.py"
   postgres:
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
-  backend:
-    build: ./backend
+    ports:
+      - "5432:5432"
   frontend:
     build: ./frontend
+  script:
+    build: ./script
