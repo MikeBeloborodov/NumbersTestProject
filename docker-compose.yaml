@@ -5,7 +5,7 @@ services:
     build: ./backend
     depends_on:
       - postgres
-    command: bash -c "./wait-for-it.sh db:5432 alembic upgrade head && python3 server.py"
+    command: bash -c "./wait-for-it.sh locaohost:5434 && alembic upgrade head && python3 server.py"
   postgres:
     image: postgres
     environment:
@@ -14,5 +14,9 @@ services:
       - "5434:5434"
   frontend:
     build: ./frontend
+    depends_on:
+      - backend
   script:
     build: ./script
+    depends_on:
+      - frontend
