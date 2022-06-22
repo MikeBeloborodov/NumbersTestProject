@@ -18,6 +18,8 @@ services:
     build: ./frontend
     depends_on:
       - backend
+    ports:
+      - "3000:3000"
   script:
     build: ./script
     depends_on:
