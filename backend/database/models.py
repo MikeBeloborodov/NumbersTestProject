@@ -11,3 +11,6 @@ class Order(Base):
     price_rub = Column(Float, nullable=False)
     price_usd = Column(Float, nullable=False)
     delivery_date = Column(Date, nullable=False)
+    
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}

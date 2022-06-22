@@ -7,7 +7,7 @@ from schemas import post_order_request
 from database.models import Order
 from sqlalchemy.orm import Session
 from database.database_logic import engine
-from flask import Response
+from flask import Response, jsonify
 
 
 def handle_save_orders(order_data: post_order_request):
@@ -21,6 +21,21 @@ def handle_save_orders(order_data: post_order_request):
         return Response("Internal Server Error.", status=500)
 
     return Response("Order saved.", status=201)
+
+
+def handle_send_all_orders():
+    try:
+        with Session(engine) as db:
+            all_orders_query = db.query(Order)
+            all_orders_raw = all_orders_query.all()
+
+            all_orders_clean = [order.as_dict() for order in all_orders_raw]
+
+    except Exception as error:
+        print(f"Error while retrieving all orders {error}")
+        return Response("Internal Server Error.", status=500)
+
+    return jsonify(all_orders_clean)
 
 
 def handle_delete_all_orders():

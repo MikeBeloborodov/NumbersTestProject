@@ -178,6 +178,7 @@ def send_data_to_server(spreadsheet_data: List[dict]) -> None:
             res = requests.post("http://localhost:5000/orders", json=data)
 
             if res.status_code != 201:
+                print(f"Res status code is: {res.status_code}")
                 raise Exception
 
     except Exception as error:
@@ -190,6 +191,7 @@ def delete_old_orders():
         res = requests.delete("http://localhost:5000/orders")
 
         if res.status_code != 200:
+            print(f"Res status code is: {res.status_code}")
             raise Exception
 
     except Exception as error:
