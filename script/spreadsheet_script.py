@@ -59,32 +59,20 @@ def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
             if not value:
                 continue
 
-            spreadsheet_row_length = len(value)
+            order_table_num = None
+            order_num = None
+            price_usd = None
+            delivery_date = None
 
-            # Check length of data to avoid index out of range
-            if spreadsheet_row_length >= 1:
-                if value[0]:
-                    order_table_num = value[0]
-            else:
-                order_table_num = None
-
-            if spreadsheet_row_length >= 2:
-                if value[1]:
-                    order_num = value[1]
-            else:
-                order_num = None
-
-            if spreadsheet_row_length >= 3:
-                if value[2]:
-                    price_usd = value[2]
-            else:
-                price_usd = None
-            
-            if spreadsheet_row_length >= 4:
-                if value[3]:
-                    delivery_date = value[3]
-            else:
-                delivery_date = None
+            for item in range(len(value)):
+                if not order_table_num:
+                    order_table_num = item;
+                elif not order_num:
+                    order_num = item
+                elif not price_usd:
+                    price_usd = item
+                elif not delivery_date:
+                    delivery_date = item
 
             prepared_data = {
                 "order_table_num": order_table_num,
