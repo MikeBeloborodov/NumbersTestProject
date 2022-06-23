@@ -26,6 +26,8 @@ def filter_orders_for_valid_dates(orders: List[dict]) -> List[dict]:
         if len(year) != 4:
             continue
 
+        filtered_orders.append(order)
+
     return filtered_orders
 
 
