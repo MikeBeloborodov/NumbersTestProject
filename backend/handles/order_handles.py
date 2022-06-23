@@ -79,7 +79,7 @@ def handle_check_order_dates():
         # Filter orders for valid dates
         valid_date_orders = filter_orders_for_valid_dates(all_orders)
         
-        # Filter expired ordeds
+        # Filter expired orders
         expired_orders = filter_orders_for_expired_dates(valid_date_orders)
 
         # Sends expired orders to telegram

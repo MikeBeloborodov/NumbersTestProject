@@ -35,4 +35,4 @@ def check_order_dates():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
