@@ -1,6 +1,8 @@
 from typing import List
 import requests
 import csv
+import time
+import datetime
 
 
 def filter_orders_for_valid_dates(orders: List[dict]) -> List[dict]:
@@ -15,8 +17,20 @@ def filter_orders_for_expired_dates(orders: List[dict]) -> List[dict]:
     """
     Checks all orders for expired dates and returns them in a list
     """
-    # TODO finish filtering logic
-    return orders
+    curr_date_raw = time.strftime("%d.%m.%Y")
+    curr_day, curr_month, curr_year = curr_date_raw.split('.')
+    curr_date_clean = datetime.datetime(int(curr_year), int(curr_month), int(curr_day))
+
+    filtered_orders = []
+    for order in orders:
+
+        order_day, order_month, order_year = order['delivery_date'].split(".")
+        delivery_date_clean = datetime.datetime(int(order_year), int(order_month), int(order_day)) 
+
+        if curr_date_clean > delivery_date_clean:
+            filtered_orders.append(order)
+
+    return filtered_orders
 
 
 def send_expired_orders_telegram(orders: List[dict]) -> bool:
@@ -36,8 +50,9 @@ def send_expired_orders_telegram(orders: List[dict]) -> bool:
     save_as_csv(orders)
 
     payload = {'document': open('expired_orders.csv', "rb")}
-    res = requests.post(base_telegram_url + telegram_bot_key + f"/sendDocument?chat_id={chat_id}",
-                            files=payload)
+    res = requests.post(
+        base_telegram_url + telegram_bot_key + f"/sendDocument?chat_id={chat_id}",
+        files=payload)
                              
     if res.status_code == 200:
         return True
