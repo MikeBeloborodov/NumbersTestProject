@@ -36,8 +36,8 @@ def send_expired_orders_telegram(orders: List[dict]) -> bool:
     save_as_csv(orders)
 
     with open('expired_orders.csv', 'w') as file:
-        res = requests.post(base_telegram_url + telegram_bot_key + "/sendMessage",
-                             json={"chat_id": chat_id, "text": file})
+        res = requests.post(base_telegram_url + telegram_bot_key + "/sendDocument",
+                             json={"chat_id": chat_id, "document": file})
                              
     if res.status_code == 200:
         return True
