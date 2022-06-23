@@ -19,9 +19,9 @@ def filter_orders_for_valid_dates(orders: List[dict]) -> List[dict]:
         if not date.replace(".", "").isnumeric():
             continue
         day, month, year = date.split(".")
-        if len(day) > 2:
+        if len(day) != 2:
             continue
-        if len(month) > 2:
+        if len(month) != 2:
             continue
         if len(year) != 4:
             continue
