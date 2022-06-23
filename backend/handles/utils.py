@@ -1,6 +1,6 @@
 from typing import List
 import requests
-import json
+import csv
 
 
 def filter_orders_for_valid_dates(orders: List[dict]) -> List[dict]:
@@ -33,12 +33,29 @@ def send_expired_orders_telegram(orders: List[dict]) -> bool:
     chat = message['chat']
     chat_id = chat['id']
 
-    payload = json.dumps(orders)
-    
-    res = requests.post(base_telegram_url + telegram_bot_key + "/sendMessage",
-                             json={"chat_id": chat_id, "text": payload})
+    save_as_csv(orders)
+
+    with open('expired_orders.csv', 'w') as file:
+        res = requests.post(base_telegram_url + telegram_bot_key + "/sendMessage",
+                             json={"chat_id": chat_id, "text": file})
                              
     if res.status_code == 200:
         return True
     else:
         return False
+
+
+def save_as_csv(orders: List[dict]):
+    with open("expired_orders.csv", "w") as file:
+        writer = csv.writer(file)
+
+        title_row = ["№ Заказа", "Срок поставки"]
+        writer.writerow(title_row)
+
+        data_to_save = []
+        for item in orders:
+            row = [item['order_num'], item['delivery_date']]
+            data_to_save.append[row]
+
+        for item in data_to_save:
+            writer.writerow(item)
