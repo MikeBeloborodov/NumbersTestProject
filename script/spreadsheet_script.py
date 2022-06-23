@@ -64,7 +64,7 @@ def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
             price_usd = None
             delivery_date = None
 
-            for item in range(len(value)):
+            for item in value:
                 if not order_table_num:
                     order_table_num = item;
                 elif not order_num:
@@ -240,6 +240,7 @@ def main() -> None:
     from the google spreadsheet, if data is different
     deletes old data from SQL database and rewrites with the new data
     """
+    print("Script is running...")
     while True:
         try:
             # Get data from the spreadsheet and convert it
