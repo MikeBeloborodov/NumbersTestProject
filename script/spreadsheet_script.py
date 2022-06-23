@@ -76,14 +76,14 @@ def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
                 elif not delivery_date:
                     delivery_date = item
 
-            # check if price_usd numeric
+            # check if price_usd is numeric
             if price_usd:
                 if not price_usd.strip().replace(",", "").replace(".", "").isnumeric():
                     price_usd = None
-            
-            # convert usd to rub
-            price_rub = price_usd * conv_rate
-            price_rub = math.trunc(price_rub * 100.0) / 100.0
+                else: 
+                    # if numeric convert usd to rub
+                    price_rub = price_usd * conv_rate
+                    price_rub = math.trunc(price_rub * 100.0) / 100.0
 
 
             prepared_data = {
