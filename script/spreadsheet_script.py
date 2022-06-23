@@ -60,22 +60,10 @@ def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
             if not value:
                 continue
 
-            order_table_num = None
-            order_num = None
-            price_usd = None
+            order_table_num, order_num, price_usd, delivery_date = value
             price_rub = None
-            delivery_date = None
 
-            for item in value:
-                if not order_table_num:
-                    order_table_num = item;
-                elif not order_num:
-                    order_num = item
-                elif not price_usd:
-                    price_usd = item
-                elif not delivery_date:
-                    delivery_date = item
-
+            # check if usd is numeric and convert usd to rub
             if price_usd.isnumeric():
                 price_usd = float(price_usd)
                 price_rub = price_usd * conv_rate
