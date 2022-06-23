@@ -77,8 +77,11 @@ def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
                     delivery_date = item
 
             if price_usd.isnumeric():
+                price_usd = float(price_usd)
                 price_rub = price_usd * conv_rate
                 price_rub = math.trunc(price_rub * 100.0) / 100.0
+            else:
+                price_usd = None
 
             prepared_data = {
                 "order_table_num": order_table_num,
