@@ -29,7 +29,7 @@ def delete_all_orders():
     return handle_delete_all_orders()
 
 
-@app.post("/orders/check_dates")
+@app.get("/orders/check_dates")
 def check_order_dates():
     return handle_check_order_dates()
 
