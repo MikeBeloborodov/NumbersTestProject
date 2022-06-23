@@ -9,7 +9,7 @@ CORS(app)
 
 @app.route("/")
 def index():
-    return {"Message": "Hello."}
+    return {"Message": "Orders API."}
 
 
 @app.get("/orders")

@@ -2,6 +2,7 @@ import os.path
 import requests
 import math
 import time
+import re
 from typing import List
 import xml.etree.ElementTree as elem_tree
 from googleapiclient.discovery import build
@@ -45,6 +46,21 @@ def get_spreadsheet_data() -> list:
     return values
 
 
+def check_usd_for_numeric(price_usd: str) -> bool:
+    """
+    Checks if price in USD is numeric or not
+    """
+    # check for multiple . in usd using regexp
+    if len(re.findall('\.', price_usd)) > 1:
+        return False
+
+    if not price_usd.replace(".", "").isnumeric():
+        return False
+    
+    # TODO add more checks
+    return True
+
+
 def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
     """
     Converts spreadsheet data of a list type into a dict type
@@ -64,7 +80,7 @@ def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
             price_rub = None
 
             # check if usd is numeric and convert usd to rub
-            if price_usd.isnumeric():
+            if check_usd_for_numeric(price_usd):
                 price_usd = float(price_usd)
                 price_rub = price_usd * conv_rate
                 price_rub = math.trunc(price_rub * 100.0) / 100.0
@@ -115,8 +131,7 @@ def get_usd_convertion_rate() -> float:
         root = tree.getroot()
         currencies = root.findall('Valute')
 
-        # Iterates trough all currencies and if finds USD
-        # returns rate value
+        # Iterates trough all currencies and returns rate value
         for item in currencies:
             name = item.find('CharCode')
             if name.text == 'USD':
@@ -147,7 +162,7 @@ def send_data_to_server(spreadsheet_data: List[dict]) -> None:
 
 def delete_old_orders():
     """
-    Sends a delete request to the backend Flask API
+    Sends a DELETE request to the backend Flask API
     Deletes all orders
     """
     try:
