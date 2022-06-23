@@ -35,12 +35,23 @@ function App() {
   return (
     <div className="container-md mt-5 mb-5">
       <div style={{display: "flex", justifyContent: "space-between"}}>
+        <div style={{display: "flex", justifyContent: "space-between"}}>
+          <div class="card m-2" style={{maxWidth: "30rem"}}>
+            <div class="card-body">
+              Добавьте в телеграмме @NumbersTestProject_filter_bot
+              и нажмите /start. После чего нажмите Отправить, чтобы
+              получить данные по просроченным заказам.
+            </div>
+          </div>
+          <button 
+          className="btn btn-secondary mt-5"
+          style={{maxHeight: "3rem"}}
+          onClick={e => {handle_send_expired_orders(e)}}
+          >Отправить</button>
+        </div>
         <button 
-        className="btn btn-dark mb-3"
-        onClick={e => {handle_send_expired_orders(e)}}
-        >Отправить</button>
-        <button 
-        className="btn btn-dark mb-3"
+        className="btn btn-secondary mt-5"
+        style={{maxHeight: "3rem"}}
         onClick={e => {handle_refresh_toggle(e)}}
         >Обновить</button>
       </div>
