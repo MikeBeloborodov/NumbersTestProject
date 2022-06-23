@@ -61,8 +61,8 @@ def send_expired_orders_telegram(orders: List[dict]) -> bool:
 
     res = requests.get(base_telegram_url + telegram_bot_key + "/getUpdates")
     result = res.json()['result']
-    message = result[0]['message']
-    chat = message['chat']
+    last_message = result[-1]['message']
+    chat = last_message['chat']
     chat_id = chat['id']
 
     save_as_csv(orders)
@@ -95,3 +95,4 @@ def save_as_csv(orders: List[dict]):
 
         for item in data_to_save:
             writer.writerow(item)
+
