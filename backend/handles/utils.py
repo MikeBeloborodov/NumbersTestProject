@@ -1,5 +1,6 @@
 from typing import List
 import requests
+import json
 
 
 def filter_orders_for_valid_dates(orders: List[dict]) -> List[dict]:
@@ -31,9 +32,11 @@ def send_expired_orders_telegram(orders: List[dict]) -> bool:
     message = result[0]['message']
     chat = message['chat']
     chat_id = chat['id']
+
+    payload = json.dumps(orders)
     
     res = requests.post(base_telegram_url + telegram_bot_key + "/sendMessage",
-                             json={"chat_id": chat_id, "text": orders})
+                             json={"chat_id": chat_id, "text": payload})
                              
     if res.status_code == 200:
         return True

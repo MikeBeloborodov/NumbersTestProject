@@ -85,9 +85,9 @@ def handle_check_order_dates():
         # Sends expired orders to telegram
         res = send_expired_orders_telegram(expired_orders)
         if res:
-            Response("Message with expired dates is sent", status=200)
+            return Response("Message with expired dates is sent", status=200)
         else:
-            Response("Error while sending to telegram", status=500)
+            return Response("Error while sending to telegram", status=500)
 
     except Exception as error:
         print(f"Error while checking order dates: {error}")
