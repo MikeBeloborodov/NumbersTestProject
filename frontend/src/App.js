@@ -29,7 +29,6 @@ function App() {
 
   function handle_send_expired_orders(e){
     fetch("http://localhost:5000/orders/check_dates")
-      .then(res => console.log(res.json()))
   }
 
   return (

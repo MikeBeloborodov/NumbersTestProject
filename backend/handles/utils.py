@@ -3,14 +3,30 @@ import requests
 import csv
 import time
 import datetime
+import re
 
 
 def filter_orders_for_valid_dates(orders: List[dict]) -> List[dict]:
     """
     Checks all orders for valid dates and returns them in a list
     """
-    # TODO finish filtering logic
-    return orders
+    filtered_orders = []
+    for order in orders:
+        date = order['delivery_date']
+
+        if len(re.findall("\.", date)) != 2:
+            continue
+        if not date.replace(".", "").isnumeric():
+            continue
+        day, month, year = date.split(".")
+        if len(day) > 2:
+            continue
+        if len(month) > 2:
+            continue
+        if len(year) != 4:
+            continue
+
+    return filtered_orders
 
 
 def filter_orders_for_expired_dates(orders: List[dict]) -> List[dict]:
@@ -61,6 +77,9 @@ def send_expired_orders_telegram(orders: List[dict]) -> bool:
 
 
 def save_as_csv(orders: List[dict]):
+    """
+    Saves expired orders in csv format
+    """
     with open("expired_orders.csv", "w") as file:
         writer = csv.writer(file)
 
