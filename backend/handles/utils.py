@@ -55,7 +55,7 @@ def save_as_csv(orders: List[dict]):
         data_to_save = []
         for item in orders:
             row = [item['order_num'], item['delivery_date']]
-            data_to_save.append[row]
+            data_to_save.append(row)
 
         for item in data_to_save:
             writer.writerow(item)
