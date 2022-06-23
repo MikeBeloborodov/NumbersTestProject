@@ -206,7 +206,7 @@ def send_data_to_server(spreadsheet_data: List[dict]) -> None:
     Sends data to the backend Flask API
     """
     try:
-        res = requests.post("http://localhost:5000/orders", json=spreadsheet_data)
+        res = requests.post("http://backend:5000/orders", json=spreadsheet_data)
 
         if res.status_code != 201:
             print(f"Res status code is: {res.status_code}")
