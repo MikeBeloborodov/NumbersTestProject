@@ -74,6 +74,11 @@ def convert_spreadsheet_data_to_dict(spreadsheet_data: list) -> List[dict]:
                 elif not delivery_date:
                     delivery_date = item
 
+            # check if price_usd numeric
+            if price_usd:
+                if not price_usd.strip().replace(",", "").replace(".", "").isnumeric():
+                    price_usd = None
+
             prepared_data = {
                 "order_table_num": order_table_num,
                 "order_num": order_num,
