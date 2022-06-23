@@ -27,10 +27,18 @@ function App() {
     setRefreshToggle(oldValue => !oldValue)
   }
 
+  function handle_send_expired_orders(e){
+    fetch("http://localhost:5000/orders/check_dates")
+      .then(res => console.log(res.json()))
+  }
+
   return (
     <div className="container-md mt-5 mb-5">
       <div style={{display: "flex", justifyContent: "space-between"}}>
-        <div></div>
+        <button 
+        className="btn btn-dark mb-3"
+        onClick={e => {handle_send_expired_orders(e)}}
+        >Отправить</button>
         <button 
         className="btn btn-dark mb-3"
         onClick={e => {handle_refresh_toggle(e)}}
