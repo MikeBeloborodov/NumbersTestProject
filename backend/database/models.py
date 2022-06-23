@@ -6,8 +6,8 @@ class Order(Base):
     __tablename__ = "orders"
 
     order_id = Column(Integer, primary_key=True, nullable=False)
-    order_table_num = Column(Integer)
-    order_num = Column(Integer)
+    order_table_num = Column(String)
+    order_num = Column(String)
     price_rub = Column(Float)
     price_usd = Column(Float)
     delivery_date = Column(String)
