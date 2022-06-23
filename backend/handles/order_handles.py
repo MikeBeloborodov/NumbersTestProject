@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 from database.database_logic import engine
 from flask import Response, jsonify
 from typing import List
-from utils import filter_orders_for_valid_dates
-from utils import filter_orders_for_expired_dates
-from utils import send_expired_orders_telegram
+from handles.utils import filter_orders_for_valid_dates
+from handles.utils import filter_orders_for_expired_dates
+from handles.utils import send_expired_orders_telegram
 
 
 def handle_save_orders(order_data: List[dict]):
